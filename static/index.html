@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image Optimizer · Encoder IT Limited</title>
+<link rel="icon" type="image/webp" href="/static/brand/favicon.webp">
+<style>
+  :root { --bg:#f5f6f8; --card:#fff; --text:#1d2330; --muted:#6b7280; --line:#e5e7eb; --accent:#2f6fed;
+    --accent-weak:#e8f0ff; --ok:#138a4a; --ok-weak:#e6f6ed; --warn:#9a5800; --warn-weak:#fff4e0; --err:#c0362c; --err-weak:#fdecea; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0f1115; --card:#171a21; --text:#e6e8ec; --muted:#9aa3b2; --line:#2a2f3a; --accent:#5b8cff;
+      --accent-weak:#1b2540; --ok:#3ccf7f; --ok-weak:#12291d; --warn:#f0b35a; --warn-weak:#2d2312; --err:#ff7a6e; --err-weak:#311816; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+  body { min-height: 100vh; display: flex; flex-direction: column; }
+  .wrap { flex: 1 0 auto; width: 100%; max-width: 980px; margin: 0 auto; padding: 28px 18px 60px; }
+  h1 { margin: 0; font-size: 24px; }
+  .brand { border-bottom: 1px solid var(--line); }
+  .brand-inner, .footer-inner { max-width: 980px; margin: 0 auto; padding: 18px; }
+  .brand img { height: 40px; width: auto; display: block; }
+  .site-footer { border-top: 1px solid var(--line); }
+  .footer-inner { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
+    font-size: 13px; color: var(--muted); text-align: center; }
+  .site-footer img { height: 20px; width: auto; }
+  .site-footer a { color: inherit; }
+  .sub { color: var(--muted); margin: 2px 0 0; font-size: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-top: 18px; }
+  .drop { border: 2px dashed var(--line); border-radius: 10px; padding: 26px; text-align: center; transition: .15s; }
+  .drop.over { border-color: var(--accent); background: var(--accent-weak); }
+  .drop p { margin: 0 0 12px; color: var(--muted); }
+  button { font: inherit; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text);
+    padding: 8px 14px; cursor: pointer; font-weight: 500; }
+  button:hover:not(:disabled) { filter: brightness(.96); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btnlink { display:inline-block; padding: 3px 10px; font-size: 13px; border:1px solid var(--line); border-radius: 8px; color: var(--text); text-decoration: none; }
+  .btnlink:hover { background: var(--accent-weak); }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: center; }
+  .sel { margin-top: 10px; font-size: 14px; color: var(--muted); text-align: center; }
+  .opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+  .opts label { cursor: pointer; }
+  .group-title { font-weight: 600; margin-bottom: 6px; }
+  .radios { margin-top: 8px; padding-left: 24px; display: flex; flex-direction: column; gap: 4px; }
+  .radios.disabled { opacity: .45; }
+  .radios .na { color: var(--err); font-size: 12px; }
+  input[type=number] { width: 80px; font: inherit; padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--card); color: var(--text); }
+  .hint { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+  .actions { display: flex; gap: 10px; align-items: center; margin-top: 18px; flex-wrap: wrap; }
+  .bar { flex: 1 1 200px; height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+  .bar div { height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+  .ptext { font-size: 13px; color: var(--muted); }
+  .totals { display: flex; gap: 22px; flex-wrap: wrap; font-size: 14px; }
+  .totals b { font-size: 17px; display: block; }
+  .totals .good { color: var(--ok); }
+  .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .folder { font-size: 13.5px; color: var(--ok); background: var(--ok-weak); border-radius: 8px; padding: 8px 12px; word-break: break-all; margin-top: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 14px; }
+  th, td { padding: 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
+  td.n, th.n { text-align: right; white-space: nowrap; }
+  .fname { font-weight: 550; word-break: break-all; }
+  .small { font-size: 12px; color: var(--muted); }
+  .st { font-size: 12.5px; padding: 1px 8px; border-radius: 6px; white-space: nowrap; display: inline-block; }
+  .st.queued { background: var(--line); color: var(--muted); }
+  .st.work { background: var(--accent-weak); color: var(--accent); }
+  .st.done { background: var(--ok-weak); color: var(--ok); }
+  .st.warn { background: var(--warn-weak); color: var(--warn); }
+  .st.error { background: var(--err-weak); color: var(--err); }
+  .note { display: block; font-size: 12px; color: var(--muted); margin-top: 3px; max-width: 300px; }
+  .hidden { display: none !important; }
+  .offline { background: var(--err-weak); color: var(--err); padding: 10px 14px; border-radius: 8px; margin-top: 14px; }
+</style>
+</head>
+<body>
+<header class="brand">
+  <div class="brand-inner">
+    <a href="https://encoderit.net" target="_blank" rel="noopener" title="Encoder IT Limited">
+      <img src="/static/brand/logo.webp" alt="Encoder IT Limited" width="268" height="58">
+    </a>
+  </div>
+</header>
+<div class="wrap">
+  <h1>Image Optimizer</h1>
+  <p class="sub">Compress JPG, PNG and WebP images, and optionally convert them to WebP or AVIF. Everything runs on this computer.</p>
+  <div id="offline" class="offline hidden">The local optimizer isn't responding. Start it again with <code>python app.py</code> (or the start script), then reload this page.</div>
+
+  <div class="card">
+    <div class="drop" id="drop">
+      <p>Drag images or folders here (JPG, JPEG, PNG, WebP)</p>
+      <div class="row">
+        <button class="primary" id="btnFiles">Select Images</button>
+        <button id="btnFolder">Select Folder</button>
+      </div>
+    </div>
+    <input type="file" id="inFiles" class="hidden" multiple accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+    <input type="file" id="inFolder" class="hidden" multiple webkitdirectory>
+    <div class="sel" id="sel">No images selected.</div>
+    <div class="sel hidden" id="subWrap"><label><input type="checkbox" id="incSub"> Include images in sub-folders (<span id="subCount">0</span>)</label></div>
+  </div>
+
+  <div class="card">
+    <div class="opts">
+      <div>
+        <label><input type="checkbox" id="convert"> <span class="group-title">Convert format</span></label>
+        <div class="radios disabled" id="radios">
+          <div class="small">Output format:</div>
+          <label><input type="radio" name="fmt" value="webp" checked disabled> WebP</label>
+          <label><input type="radio" name="fmt" value="avif" disabled> AVIF <span class="na hidden" id="avifNA">(not available, upgrade Pillow)</span></label>
+        </div>
+        <div class="hint" id="modeHint">Off: each image keeps its format and is only compressed.</div>
+      </div>
+      <div>
+        <div class="group-title">Maximum output size</div>
+        <input type="number" id="maxMB" value="3" min="0" step="0.5"> MB
+        <div class="hint">Images larger than this get slightly lower quality first. They're resized a little only if that isn't enough. Quality always comes first. Leave empty for no limit.</div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="primary" id="btnStart" disabled>Start Optimization</button>
+      <button id="btnClear">Clear</button>
+      <div class="bar"><div id="bar"></div></div>
+      <span class="ptext" id="ptext"></span>
+    </div>
+  </div>
+
+  <div class="card hidden" id="results">
+    <div class="toolbar">
+      <div class="totals">
+        <div>Images processed<b id="tCount">0</b></div>
+        <div>Original size<b id="tOrig">0</b></div>
+        <div>Optimized size<b id="tNew">0</b></div>
+        <div>Total saved<b class="good" id="tSaved">0</b></div>
+      </div>
+      <div class="row">
+        <button id="btnZip" disabled>Download all (ZIP)</button>
+        <button id="btnOpen" disabled>Open folder</button>
+      </div>
+    </div>
+    <div class="folder" id="folder"></div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>File</th><th class="n">Original Size</th><th class="n">New Size</th><th class="n">Saved</th><th>Format</th><th>Status</th><th></th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <img src="/static/brand/favicon.webp" alt="" width="112" height="124">
+    <span>Developed by <b>Harun</b> from <a href="https://encoderit.net" target="_blank" rel="noopener"><b>Encoder IT Limited</b></a> · © 2026 Encoder IT Limited. All rights reserved.</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const EXT = /\.(jpe?g|png|webp)$/i;
+  const API_HEADERS = { 'X-Image-Optimizer': '1' };
+  let files = [];            // {file, path}
+  let jobs = [];
+  let batch = null, running = false, stop = false, workers = 2;
+
+  const mb = (n) => n >= 1e6 ? (n / 1e6).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1e3)) + ' KB';
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  // ---------- server info ----------
+  fetch('/api/info').then((r) => r.json()).then((info) => {
+    workers = info.workers || 2;
+    if (!info.avif) {
+      const r = document.querySelector('input[name=fmt][value=avif]');
+      r.dataset.na = '1'; $('avifNA').classList.remove('hidden');
+    }
+  }).catch(() => $('offline').classList.remove('hidden'));
+
+  // ---------- selection ----------
+  // Images inside sub-folders of a selected folder (e.g. thumbnail folders) are skipped
+  // unless "Include sub-folders" is ticked. Hidden files (.DS_Store etc.) are always ignored.
+  let ignored = 0;
+  const isHidden = (path) => path.split('/').some((p) => p.startsWith('.'));
+  const inSubfolder = (path) => path.split('/').length > 2;   // "Folder/sub/x.jpg"
+  const chosen = () => files.filter((f) => !f.sub || $('incSub').checked);
+
+  function addFiles(list) {
+    const seen = new Set(files.map((f) => f.path + '|' + f.file.size));
+    for (const it of list) {
+      const file = it.file || it;
+      const path = it.path || file.webkitRelativePath || file.name;
+      if (!EXT.test(file.name) || isHidden(path)) { ignored++; continue; }
+      const key = path + '|' + file.size;
+      if (!seen.has(key)) { seen.add(key); files.push({ file, path, sub: inSubfolder(path) }); }
+    }
+    updateSelection();
+  }
+
+  function updateSelection() {
+    const use = chosen();
+    const subCount = files.filter((f) => f.sub).length;
+    const total = use.reduce((s, f) => s + f.file.size, 0);
+    let text = use.length ? `${use.length} image${use.length > 1 ? 's' : ''} selected (${mb(total)})` : 'No images selected.';
+    const extra = [];
+    if (subCount && !$('incSub').checked) extra.push(`${subCount} image${subCount > 1 ? 's' : ''} in sub-folders skipped`);
+    if (ignored) extra.push(`${ignored} other file${ignored > 1 ? 's' : ''} ignored`);
+    if (extra.length) text += ' · ' + extra.join(' · ');
+    $('sel').textContent = text;
+    $('subWrap').classList.toggle('hidden', !subCount);
+    $('subCount').textContent = subCount;
+    $('btnStart').disabled = !use.length || running;
+  }
+
+  async function dropEntries(dt) {
+    const entries = Array.from(dt.items || []).map((i) => i.webkitGetAsEntry && i.webkitGetAsEntry()).filter(Boolean);
+    if (!entries.length) return Array.from(dt.files || []);
+    const out = [];
+    const walk = async (e, prefix) => {
+      if (e.isFile) {
+        const f = await new Promise((res, rej) => e.file(res, rej));
+        out.push({ file: f, path: prefix + f.name });
+      } else if (e.isDirectory) {
+        const reader = e.createReader();
+        let batch;
+        do {
+          batch = await new Promise((res, rej) => reader.readEntries(res, rej));
+          for (const c of batch) await walk(c, prefix + e.name + '/');
+        } while (batch.length);
+      }
+    };
+    for (const e of entries) await walk(e, '');
+    return out;
+  }
+
+  const drop = $('drop');
+  ['dragenter', 'dragover'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, () => drop.classList.remove('over')));
+  drop.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    if (running) return;
+    try { addFiles(await dropEntries(e.dataTransfer)); } catch (err) { addFiles(Array.from(e.dataTransfer.files || [])); }
+  });
+  window.addEventListener('dragover', (e) => e.preventDefault());
+  window.addEventListener('drop', (e) => e.preventDefault());
+  $('btnFiles').onclick = () => $('inFiles').click();
+  $('btnFolder').onclick = () => $('inFolder').click();
+  if (!('webkitdirectory' in document.createElement('input'))) $('btnFolder').disabled = true;
+  $('inFiles').onchange = (e) => { addFiles(Array.from(e.target.files)); e.target.value = ''; };
+  $('inFolder').onchange = (e) => { addFiles(Array.from(e.target.files)); e.target.value = ''; };
+
+  // ---------- options ----------
+  $('convert').onchange = () => {
+    const on = $('convert').checked;
+    $('radios').classList.toggle('disabled', !on);
+    document.querySelectorAll('input[name=fmt]').forEach((r) => { r.disabled = !on || r.dataset.na === '1'; });
+    if (on) document.querySelector('input[name=fmt][value=webp]').checked = true;
+    $('modeHint').textContent = on
+      ? 'On: every image is compressed and converted to the selected format.'
+      : 'Off: each image keeps its format and is only compressed.';
+  };
+
+  // ---------- results ----------
+  function render(job) {
+    if (!job.tr) { job.tr = document.createElement('tr'); $('tbody').appendChild(job.tr); }
+    const r = job.res || {};
+    const has = r.newSize != null && (r.status === 'done' || r.status === 'warn');
+    let saved = '—';
+    if (has) {
+      const p = (1 - r.newSize / r.origSize) * 100;
+      saved = p >= 0 ? p.toFixed(0) + '%' : '+' + (-p).toFixed(0) + '%';
+    }
+    const label = { queued: 'Queued', work: 'Processing…', done: 'Done', warn: 'Over limit', error: 'Error' }[job.state];
+    let info = '';
+    if (has) {
+      info = r.origWidth + '×' + r.origHeight;
+      if (r.width !== r.origWidth) info += ' → ' + r.width + '×' + r.height;
+      info += ' · ' + r.detail + ' · ' + r.seconds + 's';
+    }
+    job.tr.innerHTML =
+      `<td><div class="fname">${esc(job.path)}</div><div class="small">${esc(info)}</div></td>` +
+      `<td class="n">${mb(job.file.size)}</td>` +
+      `<td class="n">${has ? mb(r.newSize) : '—'}</td>` +
+      `<td class="n">${saved}</td>` +
+      `<td>${has ? esc(r.format) : '—'}</td>` +
+      `<td><span class="st ${job.state}">${label}</span>${r.note ? `<span class="note">${esc(r.note)}</span>` : ''}</td>` +
+      `<td>${has ? `<a class="btnlink" href="/api/file?batch=${encodeURIComponent(batch)}&path=${encodeURIComponent(r.file)}&inline=1" target="_blank" rel="noopener">View</a>` : ''}</td>`;
+  }
+
+  function totals() {
+    const ok = jobs.filter((j) => j.res && (j.res.status === 'done' || j.res.status === 'warn'));
+    const o = ok.reduce((s, j) => s + j.res.origSize, 0), n = ok.reduce((s, j) => s + j.res.newSize, 0);
+    $('tCount').textContent = ok.length + (ok.length < jobs.length ? ' / ' + jobs.length : '');
+    $('tOrig').textContent = mb(o);
+    $('tNew').textContent = mb(n);
+    $('tSaved').textContent = o ? `${mb(Math.max(0, o - n))} (${((1 - n / o) * 100).toFixed(0)}%)` : '0';
+    $('btnZip').disabled = running || !ok.length;
+    $('btnOpen').disabled = !batch;
+  }
+
+  async function processJob(job, opts) {
+    job.state = 'work'; render(job);
+    const qs = new URLSearchParams({ batch, path: job.out, max_mb: opts.maxMB, convert: opts.convert || '' });
+    try {
+      const resp = await fetch('/api/optimize?' + qs, { method: 'POST', headers: API_HEADERS, body: job.file });
+      const r = await resp.json();
+      if (!resp.ok) throw new Error(r.error || resp.statusText);
+      job.res = r;
+      job.state = r.status === 'done' ? 'done' : r.status === 'warn' ? 'warn' : 'error';
+    } catch (err) {
+      job.res = { note: 'Could not reach the local optimizer (' + err.message + ').' };
+      job.state = 'error';
+    }
+    render(job);
+  }
+
+  $('btnStart').onclick = async () => {
+    if (running) { stop = true; $('btnStart').disabled = true; $('btnStart').textContent = 'Stopping…'; return; }
+    if (!chosen().length) return;
+    const convert = $('convert').checked ? document.querySelector('input[name=fmt]:checked').value : null;
+    const maxMB = parseFloat($('maxMB').value) > 0 ? parseFloat($('maxMB').value) : 0;
+    let resp;
+    try {
+      resp = await fetch('/api/batch', { method: 'POST', headers: API_HEADERS });
+      if (!resp.ok) throw new Error();
+    } catch (e) { $('offline').classList.remove('hidden'); return; }
+    const b = await resp.json();
+    batch = b.batch;
+    running = true; stop = false;
+    $('btnStart').textContent = 'Stop';
+    ['btnClear', 'btnFiles', 'btnFolder', 'convert', 'incSub'].forEach((id) => { $(id).disabled = true; });
+    $('results').classList.remove('hidden');
+    $('tbody').innerHTML = '';
+    $('folder').textContent = '✓ Optimized images are saved automatically (no need to download them) to: ' + b.folder;
+    // Output goes straight into OptimizedImages_<date>/ — drop the selected folder's own name
+    // (only deeper sub-folders, if included, are kept).
+    const outPath = (p) => (p.includes('/') ? p.split('/').slice(1).join('/') : p);
+    jobs = chosen().map((f) => ({ file: f.file, path: f.path, out: outPath(f.path), state: 'queued' }));
+    jobs.forEach(render); totals();
+
+    let next = 0, done = 0;
+    const progress = () => { $('bar').style.width = (done / jobs.length * 100) + '%'; $('ptext').textContent = `${done} / ${jobs.length}`; };
+    progress();
+    const worker = async () => {
+      while (next < jobs.length && !stop) {
+        const job = jobs[next++];
+        await processJob(job, { convert, maxMB });
+        done++; progress(); totals();
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(workers, jobs.length) }, worker));
+    jobs.filter((j) => j.state === 'queued').forEach((j) => { j.state = 'error'; j.res = { note: 'Stopped' }; render(j); });
+
+    running = false;
+    $('btnStart').textContent = 'Start Optimization';
+    $('btnStart').disabled = false;
+    ['btnClear', 'btnFiles', 'btnFolder', 'convert', 'incSub'].forEach((id) => { $(id).disabled = false; });
+    $('ptext').textContent = stop ? 'Stopped' : 'Finished';
+    totals();
+  };
+
+  $('btnClear').onclick = () => {
+    if (running) return;
+    files = []; jobs = []; batch = null; ignored = 0; $('incSub').checked = false;
+    $('tbody').innerHTML = ''; $('results').classList.add('hidden');
+    $('bar').style.width = '0'; $('ptext').textContent = '';
+    updateSelection();
+  };
+  $('incSub').onchange = updateSelection;
+
+  $('btnZip').onclick = () => { if (batch) location.href = '/api/zip?batch=' + encodeURIComponent(batch); };
+  $('btnOpen').onclick = () => fetch('/api/open?batch=' + encodeURIComponent(batch || ''), { method: 'POST', headers: API_HEADERS });
+})();
+</script>
+</body>
+</html>

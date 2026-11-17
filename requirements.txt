@@ -1,0 +1,2 @@
+# Pillow 11.3+ includes JPEG (libjpeg-turbo), PNG, WebP and AVIF (libavif) encoders in its wheels.
+pillow>=11.3

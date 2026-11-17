@@ -1,0 +1,14 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local tool settings
+.claude/
+
+# Local test output (optimizer.py CLI default)
+output/
