@@ -1,6 +1,8 @@
 # Image Optimizer
 
-**by Encoder IT Limited**
+**Developed by Harun from Encoder IT Limited**
+
+**GitHub:** https://github.com/encoderit-harun/image-optimizer
 
 Reduces the file size of JPG, JPEG, PNG and WebP images. It can also convert images to WebP or AVIF.
 Everything runs on your own computer. No image is ever uploaded to the internet.
@@ -124,5 +126,6 @@ image-optimizer/
 
 <p align="center">
   Developed by <b>Harun</b> from <b>Encoder IT Limited</b><br>
+  <a href="https://github.com/encoderit-harun/image-optimizer">github.com/encoderit-harun/image-optimizer</a><br>
   © 2026 Encoder IT Limited. All rights reserved.
 </p>
